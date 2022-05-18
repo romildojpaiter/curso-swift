@@ -11,8 +11,7 @@ class RemoteAddAccount {
     }
     
     func add(addAccountModel: AddAccountModel) {
-        let data = try? JSONEncoder().encode(addAccountModel)
-        httpClient.post(to: url, with: data)
+        httpClient.post(to: url, with: addAccountModel.toData())
     }
 }
 
@@ -25,25 +24,21 @@ class RemoteAddAccountTests: XCTestCase {
     
     func test_add_should_call_httpPostClient_with_corret_url() throws {
         let url = URL(string: "http://any-url.com")!
-        let httpClientSpy = HttpClientSpy()
-        let sut = RemoteAddAccount(url: url, httpClient: httpClientSpy)
-        
+        let (sut, httpClientSpy) = makeCreateSut()
         let _addAccountModel = createAccount()
+        
         sut.add(addAccountModel: _addAccountModel)
         
         XCTAssertEqual(httpClientSpy.url, url)
     }
     
     func test_add_should_call_httpPostClient_with_corret_data() throws {
-        let url = URL(string: "http://any-url.com")!
-        let httpClientSpy = HttpClientSpy()
-        let sut = RemoteAddAccount(url: url, httpClient: httpClientSpy)
-        
+        let (sut, httpClientSpy) = makeCreateSut()
         let _addAccountModel = createAccount()
-        sut.add(addAccountModel: _addAccountModel)
-        let _data = try? JSONEncoder().encode(_addAccountModel)
         
-        XCTAssertEqual(httpClientSpy.data, _data)
+        sut.add(addAccountModel: _addAccountModel)
+        
+        XCTAssertEqual(httpClientSpy.data, _addAccountModel.toData())
     }
      
 }
@@ -62,6 +57,12 @@ extension RemoteAddAccountTests {
     
     func createAccount() -> AddAccountModel {
         return AddAccountModel(name: "any name", email: "any_email@email.com", password: "any_password", passwordConfirmation: "any_password")
+    }
+    
+    func makeCreateSut(url: URL = URL(string: "http://any-url.com")!) -> (sut: RemoteAddAccount, httpClientSpy: HttpClientSpy) {
+        let httpClientSpy = HttpClientSpy()
+        let sut = RemoteAddAccount(url: url, httpClient: httpClientSpy)
+        return (sut, httpClientSpy)
     }
 
 }
