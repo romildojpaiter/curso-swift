@@ -3,7 +3,7 @@ import Foundation
 public protocol AddAccount {
     
     func add(addAccountModel: AddAccountModel, completion: @escaping (Result<AccountModel, DomainError>) -> Void)
-    
+
 }
 
 public struct AddAccountModel : Model {
