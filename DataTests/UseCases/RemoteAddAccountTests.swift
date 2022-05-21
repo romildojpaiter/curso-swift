@@ -44,6 +44,16 @@ class RemoteAddAccountTests: XCTestCase {
             httpClientSpy.completeWithData(makeInvalidData())
         })
     }
+    
+    func test_add_shoud_not_complete_if_sut_has_been_deallocated() {
+        let httpClientySpy = HttpClientSpy()
+        var sut: RemoteAddAccount? = RemoteAddAccount(url: makeUrl(), httpClient: httpClientySpy)
+        var result: Result<AccountModel, DomainError>?
+        sut?.add(addAccountModel: makeAddAccountModel()) { result = $0 }
+        sut = nil
+        httpClientySpy.completeWithError(.noConnectivity)
+        XCTAssertNil(result)
+    }
      
 }
 
@@ -88,7 +98,7 @@ extension RemoteAddAccountTests {
     
     func checkMemoryLeak(for instance: AnyObject, file: StaticString = #file, line: UInt = #line) {
         addTeardownBlock { [weak instance] in
-            XCTAssertNil(sut, file: file, line: line )
+            XCTAssertNil(instance, file: file, line: line )
         }
     }
     
