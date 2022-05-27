@@ -18,22 +18,28 @@ class AlamofireAdapterTests: XCTestCase {
 
     func test_() {
         let url = makeUrl()
+        
+        // Controi as dependencias para o Alamofire
         let configuration = URLSessionConfiguration.default
+        configuration.protocolClasses = [UrlProtocolStub.self]
         let session = Session(configuration: configuration)
+        
+        // Cenário
         let sut = AlamofireAdapter(session: session)
         sut.post(to: url)
         
         // serve para fazer o teste aguarda
         let exp = expectation(description: "waiting")
         
+        // Testes
         UrlProtocolStub.observerRequest { request in
             XCTAssertEqual(url, request.url)
             XCTAssertEqual("POST", request.httpMethod)
             exp.fulfill()
         }
+        
         wait(for: [exp], timeout: 5)
     }
-    
     
 
 }
@@ -46,7 +52,6 @@ class UrlProtocolStub: URLProtocol {
     static func observerRequest(completion: @escaping (URLRequest) -> Void) {
         UrlProtocolStub.emit = completion
     }
-    
     
     override open class func canInit(with request: URLRequest) -> Bool {
         return true
