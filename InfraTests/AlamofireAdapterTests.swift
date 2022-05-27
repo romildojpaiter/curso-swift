@@ -1,5 +1,4 @@
 import XCTest
-
 import Alamofire
 
 class AlamofireAdapter {
@@ -28,12 +27,11 @@ class AlamofireAdapterTests: XCTestCase {
         let exp = expectation(description: "waiting")
         
         UrlProtocolStub.observerRequest { request in
-            
             XCTAssertEqual(url, request.url)
             XCTAssertEqual("POST", request.httpMethod)
             exp.fulfill()
         }
-        wait(for: [exp], timeout: 1)
+        wait(for: [exp], timeout: 5)
     }
     
     
