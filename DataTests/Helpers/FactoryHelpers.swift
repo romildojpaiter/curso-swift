@@ -11,3 +11,9 @@ func makeUrl() -> URL {
 func makeValidData() -> Data {
     return Data("{\"name\":\"Romildo\"}".utf8)
 }
+
+func makeError() -> Error {
+    return NSError(domain: "any_erro", code: 0)
+}
+
+
