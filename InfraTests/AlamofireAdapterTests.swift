@@ -42,11 +42,15 @@ class AlamofireAdapterTests: XCTestCase {
     func test_post_should_complete_with_error_when_request_completes_with_error() {
         let sut = makeSut()
         UrlProtocolStub.simulate(data: nil, response: nil, error: makeError())
+        let exp =  expectation(description: "waiting")
         sut.post(to: makeUrl(), with: makeValidData()) { result in
             switch result {
-                
+            case .failure(let error): XCTAssertEqual(error, .noConnectivity)
+            case .success: XCTFail("Expected error got \(result) instead")
             }
+            exp.fulfill()
         }
+        wait(for: [exp], timeout: 1)
     }
     
 
@@ -67,7 +71,7 @@ extension AlamofireAdapterTests {
     
     func testRequestFor(url: URL = makeUrl(), data: Data?, action: @escaping (URLRequest) -> Void) {
         let sut = makeSut()
-        sut.post(to: url, with: data)
+        sut.post(to: url, with: data) { _ in }
         let exp = expectation(description: "waiting")
         UrlProtocolStub.observerRequest { request in
             action(request)
